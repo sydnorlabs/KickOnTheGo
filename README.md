@@ -40,9 +40,23 @@ So I built KickOnTheGo with Claude Duet: tabs for up to 5 streams where only one
 
 ## Install
 
-Download `KickOnTheGo-1.0.0.apk` from [Releases](https://github.com/sydnorlabs/KickOnTheGo/releases) and open it on your phone (Android 8.0 or later). To get updates automatically, add this repo's URL in [Obtainium](https://github.com/ImranR98/Obtainium).
+### Install the APK
 
-KickOnTheGo installs as its own app (`dev.sydnorlabs.kickonthego`), so it can sit next to OpenKick.
+1. On your phone, open the [latest release](https://github.com/sydnorlabs/KickOnTheGo/releases/latest) and tap **KickOnTheGo-1.0.0.apk** under **Assets** to download it.
+2. Open the downloaded file from your notifications or from **Files > Downloads**.
+3. If Android asks, allow your browser or Files app to install unknown apps, then go back.
+4. Tap **Install**. If Play Protect warns that it doesn't recognize the app, tap **More details > Install anyway**.
+5. Open KickOnTheGo. You can use it as a guest or sign in to Kick from the welcome screen.
+
+Needs Android 8.0 or later. KickOnTheGo installs as its own app (`dev.sydnorlabs.kickonthego`), so it can sit next to OpenKick.
+
+### Get updates automatically with Obtainium
+
+1. Install [Obtainium](https://github.com/ImranR98/Obtainium).
+2. Tap **Add App**, paste `https://github.com/sydnorlabs/KickOnTheGo` and tap **Add**.
+3. Tap **Install**. Obtainium will let you know when a new version is out.
+
+To update by hand, download the new APK from Releases and install it over the old one. Your settings and sign-in stay.
 
 ## Support
 

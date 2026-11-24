@@ -11,7 +11,24 @@ First release of KickOnTheGo, an unofficial Kick app for Android built on OpenKi
 Everything else comes from OpenKick 1.4: Kick sign-in, live rewind, clips and VODs, downloads, 7TV emotes and chat replay.
 
 ## Install
-Download `KickOnTheGo-1.0.0.apk` below and open it on your phone (Android 8.0 or later). It installs as its own app (`dev.sydnorlabs.kickonthego`), so it can sit next to OpenKick. For automatic updates, add this repo in Obtainium.
+
+#### Install the APK
+
+1. On your phone, open this release and tap **KickOnTheGo-1.0.0.apk** under **Assets** to download it.
+2. Open the downloaded file from your notifications or from **Files > Downloads**.
+3. If Android asks, allow your browser or Files app to install unknown apps, then go back.
+4. Tap **Install**. If Play Protect warns that it doesn't recognize the app, tap **More details > Install anyway**.
+5. Open KickOnTheGo. You can use it as a guest or sign in to Kick from the welcome screen.
+
+Needs Android 8.0 or later. KickOnTheGo installs as its own app (`dev.sydnorlabs.kickonthego`), so it can sit next to OpenKick.
+
+#### Get updates automatically with Obtainium
+
+1. Install [Obtainium](https://github.com/ImranR98/Obtainium).
+2. Tap **Add App**, paste `https://github.com/sydnorlabs/KickOnTheGo` and tap **Add**.
+3. Tap **Install**. Obtainium will let you know when a new version is out.
+
+To update by hand, download the new APK from Releases and install it over the old one. Your settings and sign-in stay.
 
 ## Support
 KickOnTheGo is free and open source. If it makes your drive better, you can support it on Ko-fi: https://ko-fi.com/sydnorlabs
