@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.android.application)
@@ -18,7 +20,7 @@ android {
     // Release signing: keystore.properties sits outside the repo (storeFile, storePassword, keyAlias, keyPassword).
     val keystorePropsFile = providers.gradleProperty("kotgKeystoreProps").map { file(it) }.orNull
     if (keystorePropsFile != null && keystorePropsFile.exists()) {
-        val props = java.util.Properties().apply { keystorePropsFile.inputStream().use { load(it) } }
+        val props = Properties().apply { keystorePropsFile.inputStream().use { load(it) } }
         signingConfigs {
             create("kotgRelease") {
                 storeFile = file(props.getProperty("storeFile"))
