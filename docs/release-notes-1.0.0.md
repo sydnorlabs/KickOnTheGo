@@ -30,6 +30,10 @@ Needs Android 8.0 or later. KickOnTheGo installs as its own app (`dev.sydnorlabs
 
 To update by hand, download the new APK from Releases and install it over the old one. Your settings and sign-in stay.
 
+## Verify
+APK SHA-256: `156989b4fe0caff6714b49b5fda1345a10c7312dcb1ca192acfbbb0c8203ef30`
+Signing certificate SHA-256: `9ba881f9acc69d8ea43b5dee076e266643e7b97768d9400cbb6ae2c69a87cda3`
+
 ## Support
 KickOnTheGo is free and open source. If it makes your drive better, you can support it on Ko-fi: https://ko-fi.com/sydnorlabs
 

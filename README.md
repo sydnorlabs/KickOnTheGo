@@ -62,6 +62,8 @@ To update by hand, download the new APK from Releases and install it over the ol
 
 KickOnTheGo is free and open source. If it makes your drive or your day better, a donation helps me keep it updated with each new OpenKick release and keep my build server running: [ko-fi.com/sydnorlabs](https://ko-fi.com/sydnorlabs)
 
+Every release is signed with the same key. Signing certificate SHA-256: `9ba881f9acc69d8ea43b5dee076e266643e7b97768d9400cbb6ae2c69a87cda3`
+
 ## Feedback
 
 Found a bug or have an idea? [Open an issue](https://github.com/sydnorlabs/KickOnTheGo/issues) on GitHub. You can also leave a message on [Ko-fi](https://ko-fi.com/sydnorlabs).
