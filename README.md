@@ -48,6 +48,10 @@ KickOnTheGo installs as its own app (`dev.sydnorlabs.kickonthego`), so it can si
 
 KickOnTheGo is free and open source. If it makes your drive or your day better, a donation helps me keep it updated with each new OpenKick release and keep my build server running: [ko-fi.com/sydnorlabs](https://ko-fi.com/sydnorlabs)
 
+## Feedback
+
+Found a bug or have an idea? [Open an issue](https://github.com/sydnorlabs/KickOnTheGo/issues) on GitHub. You can also leave a message on [Ko-fi](https://ko-fi.com/sydnorlabs).
+
 ## Build
 
 Use JDK 17 or later and Android SDK Platform 36.
