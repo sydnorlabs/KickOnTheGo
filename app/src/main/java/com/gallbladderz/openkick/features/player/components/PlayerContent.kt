@@ -80,6 +80,7 @@ fun PlayerContent(
     onPlayerManagerRelease: () -> Unit,
     onFullscreenToggle: () -> Unit,
     onShowSettings: () -> Unit,
+    onShowFollowing: (() -> Unit)? = null,
     onBackClick: () -> Unit,
     onUpdateVideoBounds: (android.graphics.Rect) -> Unit,
     dragState: AnchoredDraggableState<PlayerExpandedState>,
@@ -224,6 +225,7 @@ fun PlayerContent(
                                 onPlayerManagerPause = onPlayerManagerPause,
                                 onFullscreenToggle = onFullscreenToggle,
                                 onShowSettings = onShowSettings,
+                                onShowFollowing = onShowFollowing,
                                 onBackClick = onBackClick,
                                 onToggleChat = { isLandscapeChatOpen = !isLandscapeChatOpen }
                             )

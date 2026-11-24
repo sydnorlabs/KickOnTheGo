@@ -357,4 +357,12 @@
         <item quantity="one">Gifted %1$d sub</item>
         <item quantity="other">Gifted %1$d subs</item>
     </plurals>
+    <string name="stream_tabs_new">Open another stream</string>
+    <string name="stream_tabs_close">Close %1$s</string>
+    <string name="stream_open_new_tab">Watch in new tab</string>
+    <string name="stream_open_background_tab">Open in background tab</string>
+    <string name="stream_tab_already_open">Already open in a tab</string>
+    <string name="stream_background_tab_added">%1$s added to your tabs</string>
+    <string name="stream_show_following">Show the channels you follow</string>
+    <string name="offline">Offline</string>
 </resources>

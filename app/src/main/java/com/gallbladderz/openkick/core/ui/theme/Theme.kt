@@ -75,11 +75,17 @@ private fun withAccent(colorScheme: ColorScheme, accent: Color): ColorScheme {
     )
 }
 
+// The highlight (container) colors are set here too. Left out, Material fills them with its
+// default purple, which is what the selected stream tab and setting chips showed.
 private val KickDarkColorScheme = darkColorScheme(
     primary = KickGreen,
     onPrimary = Color.Black,
+    primaryContainer = KickGreen.copy(alpha = 0.32f),
+    onPrimaryContainer = Color.White,
     secondary = KickGreenDark,
     onSecondary = Color.White,
+    secondaryContainer = KickGreen.copy(alpha = 0.16f),
+    onSecondaryContainer = Color.White,
     background = KickBackground,
     onBackground = KickTextPrimary,
     surface = KickSurface,
@@ -93,8 +99,12 @@ private val KickDarkColorScheme = darkColorScheme(
 private val KickLightColorScheme = lightColorScheme(
     primary = KickGreenDark,
     onPrimary = Color.White,
+    primaryContainer = KickGreenDark.copy(alpha = 0.28f),
+    onPrimaryContainer = Color(0xFF141416),
     secondary = KickGreen,
     onSecondary = Color.Black,
+    secondaryContainer = KickGreenDark.copy(alpha = 0.14f),
+    onSecondaryContainer = Color(0xFF141416),
     background = Color(0xFFF0F0F0),
     onBackground = Color(0xFF141416),
     surface = Color.White,

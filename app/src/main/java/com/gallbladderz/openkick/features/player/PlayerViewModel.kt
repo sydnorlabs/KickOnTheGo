@@ -134,9 +134,12 @@ class PlayerViewModel(
 
     fun loadStreamInfo(streamerName: String) {
         streamInfoJob?.cancel()
-        if (currentStreamerName != streamerName) {
+        val previousStreamer = currentStreamerName
+        if (previousStreamer == null || !previousStreamer.equals(streamerName, ignoreCase = true)) {
             livePlayback.close()
             currentPlaybackUrl = null
+            // Moving to another stream tab: stop the old stream and its chat straight away.
+            if (previousStreamer != null) switchAwayFrom()
         }
         currentStreamerName = streamerName
         _chatMode.update { ChatMode() }
@@ -158,7 +161,8 @@ class PlayerViewModel(
                                 categoryName = streamInfo.categoryName,
                                 categorySlug = streamInfo.categorySlug,
                                 isVerified = streamInfo.isVerified,
-                                kickUserId = streamInfo.kickUserId
+                                kickUserId = streamInfo.kickUserId,
+                                streamerName = streamerName
                             )
                         }
 
@@ -188,8 +192,30 @@ class PlayerViewModel(
                             )
                         }
                     }
+                    result.onFailure { error ->
+                        // Previously a failed load (e.g. an offline channel) left the spinner
+                        // up forever; with tabs that would also hide which tab is broken.
+                        if (_uiState.value !is PlayerUiState.Playing) {
+                            _uiState.update {
+                                PlayerUiState.Error(error.message ?: streamerName)
+                            }
+                        }
+                    }
                 }
         }
+    }
+
+    /**
+     * Called when the player moves to another stream tab. Stops the old stream and closes its
+     * chat straight away, so a background tab never keeps downloading video or chat.
+     */
+    private fun switchAwayFrom() {
+        channelLinksJob?.cancel()
+        playerManager.stop()
+        chatRepository.disconnect()
+        currentPlaybackUrl = null
+        _uiState.update { PlayerUiState.Loading }
+        _channelLinks.update { emptyList() }
     }
 
     fun loadChannelLinks(streamerName: String) {

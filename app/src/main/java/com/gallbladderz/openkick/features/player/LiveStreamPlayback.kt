@@ -44,6 +44,7 @@ internal class LiveStreamPlayback(
         session?.close()
         session = null
         _state.value = LivePlaybackState()
+        manager.setLiveRewindActive(false)
     }
 
     fun seekTo(positionMs: Long) {
@@ -76,7 +77,11 @@ internal class LiveStreamPlayback(
 
         private var mode: LivePlaybackMode
             get() = _state.value.mode
-            set(value) = _state.update { it.copy(mode = value) }
+            set(value) {
+                _state.update { it.copy(mode = value) }
+                // Tells the reconnect and jump-to-live logic to leave a rewound stream alone.
+                manager.setLiveRewindActive(value != LivePlaybackMode.LIVE)
+            }
 
         fun start() {
             player.addListener(this)
@@ -186,7 +191,9 @@ internal class LiveStreamPlayback(
 
         override fun onPlayerError(error: PlaybackException) {
             if (mode == LivePlaybackMode.ARCHIVE) {
-                switchToLive()
+                // A dropped connection reconnects in place (PlayerManager); anything else
+                // goes back to live as before.
+                if (!manager.reconnectsAfter(error)) switchToLive()
             } else if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
                 mode = LivePlaybackMode.LIVE
                 manager.seekToLiveEdge()

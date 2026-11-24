@@ -29,6 +29,7 @@ fun PlayerControlsOverlay(
     onPlayerManagerPause: () -> Unit,
     onFullscreenToggle: () -> Unit,
     onShowSettings: () -> Unit,
+    onShowFollowing: (() -> Unit)? = null,
     onBackClick: () -> Unit,
     onToggleChat: () -> Unit = {}
 ) {
@@ -46,6 +47,7 @@ fun PlayerControlsOverlay(
         },
         onFullscreen = onFullscreenToggle,
         onSettings = onShowSettings,
+        onFollowing = onShowFollowing,
         onBack = { if (isFullscreen) onFullscreenToggle() else onBackClick() },
         onToggleChat = onToggleChat,
         modifier = Modifier.fillMaxSize()

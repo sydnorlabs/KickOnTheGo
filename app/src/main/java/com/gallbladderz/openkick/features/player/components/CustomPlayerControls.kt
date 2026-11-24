@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -63,6 +64,7 @@ fun CustomPlayerControls(
     onFullscreen: () -> Unit,
     onSettings: (() -> Unit)?,
     onBack: (() -> Unit)? = null,
+    onFollowing: (() -> Unit)? = null,
     onToggleChat: () -> Unit = {},
     livePlayer: Player? = null,
     livePlaybackState: LivePlaybackState = LivePlaybackState(),
@@ -105,6 +107,15 @@ fun CustomPlayerControls(
                         contentDescription = stringResource(R.string.toggle_chat_desc),
                         tint = Color.White,
                         modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+            if (onFollowing != null) {
+                IconButton(onClick = onFollowing) {
+                    Icon(
+                        Icons.Default.People,
+                        contentDescription = stringResource(R.string.stream_show_following),
+                        tint = Color.White
                     )
                 }
             }

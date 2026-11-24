@@ -75,7 +75,11 @@ fun NavGraphBuilder.mainTabsScreen(navController: NavController) {
                                 },
                                 onCategoryClick = { slug ->
                                     navController.navigate(CategoryDetailsRoute(slug))
-                                }
+                                },
+                                // Long-press "open in background tab" while a stream is playing.
+                                onStreamOpenInBackground = if (globalPlayerController.currentStreamerName != null) {
+                                    { slug -> globalPlayerController.openInBackgroundTab(slug) }
+                                } else null
                             )
                         }
 

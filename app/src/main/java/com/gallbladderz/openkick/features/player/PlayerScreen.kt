@@ -19,6 +19,8 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.os.SystemClock
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -35,10 +37,12 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -66,6 +70,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -77,22 +82,28 @@ import com.gallbladderz.openkick.core.domain.chat.ChatEmoteSet
 import com.gallbladderz.openkick.core.domain.chat.ChatMessage
 import com.gallbladderz.openkick.core.domain.chat.PinnedChatMessage
 import com.gallbladderz.openkick.core.domain.model.ChannelLink
+import com.gallbladderz.openkick.core.player.LocalGlobalPlayerController
 import com.gallbladderz.openkick.core.player.PlaybackService
 import com.gallbladderz.openkick.core.player.PlayerExpandedState
+import com.gallbladderz.openkick.core.player.StreamTab
 import com.gallbladderz.openkick.core.player.VideoQuality
 import com.gallbladderz.openkick.core.ui.utils.DeviceOrientation
 import com.gallbladderz.openkick.core.ui.utils.findActivity
 import com.gallbladderz.openkick.core.ui.utils.rememberDeviceOrientation
 import com.gallbladderz.openkick.features.player.components.SevenTvChat
+import com.gallbladderz.openkick.features.player.components.FollowingQuickList
 import com.gallbladderz.openkick.features.player.components.PlayerContent
 import com.gallbladderz.openkick.features.player.components.PlayerTabs
 import com.gallbladderz.openkick.features.player.components.QualitySelectionSheet
+import com.gallbladderz.openkick.features.player.components.StreamTabsBar
 import com.gallbladderz.openkick.features.player.components.StreamerInfoOverlay
 import com.gallbladderz.openkick.features.player.models.LivePlaybackState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import com.gallbladderz.openkick.features.following.FollowingUiState
+import com.gallbladderz.openkick.features.following.FollowingViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -132,6 +143,54 @@ fun PlayerRoute(
     var displayedChatSettings by remember { mutableStateOf(chatSettings) }
 
     LaunchedEffect(chatSettings) { displayedChatSettings = chatSettings }
+
+    val globalPlayerController = LocalGlobalPlayerController.current
+    val tabsState = globalPlayerController.tabsState
+    val context = LocalContext.current
+
+    // Your Following list loads as soon as the player opens and refreshes every 2 minutes
+    // while the app is on screen (never with the screen locked), so the Following tab is
+    // already filled in when you tap it.
+    val followingViewModel: FollowingViewModel = koinViewModel()
+    val followingState by followingViewModel.uiState.collectAsStateWithLifecycle()
+    val followingRefreshing by followingViewModel.isRefreshing.collectAsStateWithLifecycle()
+    var lastFollowing by remember { mutableStateOf<FollowingUiState.Success?>(null) }
+    LaunchedEffect(followingState) {
+        val state = followingState
+        if (state is FollowingUiState.Success && state.hasChannels()) lastFollowing = state
+    }
+    // A refresh briefly empties the list (or fails on a weak signal); keep showing the last
+    // full list meanwhile instead of "nothing here".
+    val shownFollowing: FollowingUiState = run {
+        val state = followingState
+        val loaded = lastFollowing
+        val stillLoading = followingRefreshing || state is FollowingUiState.Loading
+        when {
+            state is FollowingUiState.Success && state.hasChannels() -> state
+            loaded != null && (stillLoading || state is FollowingUiState.Error) -> loaded
+            state is FollowingUiState.Success && stillLoading -> FollowingUiState.Loading
+            else -> state
+        }
+    }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(followingViewModel, lifecycle) {
+        var lastRefreshMs = SystemClock.elapsedRealtime()
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+                val waitMs = FOLLOWING_REFRESH_MS - (SystemClock.elapsedRealtime() - lastRefreshMs)
+                if (waitMs > 0) delay(waitMs)
+                followingViewModel.refresh()
+                lastRefreshMs = SystemClock.elapsedRealtime()
+            }
+        }
+    }
+
+    LaunchedEffect(uiState, streamerName) {
+        val state = uiState
+        if (state is PlayerUiState.Playing && state.streamerName.equals(streamerName, ignoreCase = true)) {
+            globalPlayerController.updateTabInfo(streamerName, state.avatarUrl, state.title)
+        }
+    }
 
     val closePlayer = {
         viewModel.playerManager.release()
@@ -183,6 +242,21 @@ fun PlayerRoute(
             onBackClick = closePlayer,
             onAvatarClick = onAvatarClick,
             onCategoryClick = { slug -> onCategoryClick(slug) },
+            followingState = shownFollowing,
+            streamTabs = tabsState.tabs,
+            activeTabSlug = tabsState.activeSlug,
+            onSelectTab = { globalPlayerController.selectTab(it) },
+            onCloseTab = { globalPlayerController.closeTab(it) },
+            onNewTab = { globalPlayerController.minimizePlayer() },
+            onOpenInNewTab = { globalPlayerController.expandPlayer(it) },
+            onOpenInBackground = { slug ->
+                globalPlayerController.openInBackgroundTab(slug)
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.stream_background_tab_added, slug),
+                    Toast.LENGTH_SHORT
+                ).show()
+            },
             livePlaybackState = livePlaybackState,
             onSeekLiveTimeline = viewModel::seekLiveTimeline,
             onSeekToLiveEdge = viewModel::seekToLiveEdge,
@@ -233,6 +307,14 @@ fun PlayerScreen(
     onCategoryClick: (String) -> Unit = {},
     livePlaybackState: LivePlaybackState = LivePlaybackState(),
     onSeekLiveTimeline: (Long) -> Unit = {},
+    followingState: FollowingUiState = FollowingUiState.Loading,
+    streamTabs: List<StreamTab> = emptyList(),
+    activeTabSlug: String? = null,
+    onSelectTab: (String) -> Unit = {},
+    onCloseTab: (String) -> Unit = {},
+    onNewTab: () -> Unit = {},
+    onOpenInNewTab: (String) -> Unit = {},
+    onOpenInBackground: (String) -> Unit = {},
     onSeekToLiveEdge: () -> Unit = {},
     onSendChatMessage: (String, ChatMessage?) -> Unit = { _, _ -> },
     onChatSettingsChange: (ChatSettings) -> Unit = {}
@@ -261,6 +343,9 @@ fun PlayerScreen(
     var playerInteractionTick by remember { mutableIntStateOf(0) }
     var showSettingsSheet by remember { mutableStateOf(false) }
     var showChatSettingsSheet by remember { mutableStateOf(false) }
+    // Pinned Following tab (replaces chat under the video) and the pop-up version of it.
+    var showFollowingPane by remember { mutableStateOf(false) }
+    var showFollowingSheet by remember { mutableStateOf(false) }
 
     val deviceOrientation = rememberDeviceOrientation()
     var isFullscreen by remember {
@@ -440,7 +525,18 @@ fun PlayerScreen(
         }
     }
 
+    // The media notification asks for the player with chat: leave full screen (which also
+    // unlocks the landscape orientation) and show chat rather than the Following list.
+    val chatViewRequests = LocalGlobalPlayerController.current.chatViewRequests
+    LaunchedEffect(chatViewRequests) {
+        if (chatViewRequests > 0) {
+            isFullscreen = false
+            showFollowingPane = false
+        }
+    }
+
     LaunchedEffect(streamerName) {
+        showFollowingPane = false
         onLoadStreamInfo(streamerName)
         onLoadChannelLinks(streamerName)
     }
@@ -489,6 +585,7 @@ fun PlayerScreen(
                     onPlayerManagerRelease = onPlayerManagerRelease,
                     onFullscreenToggle = toggleFullscreen,
                     onShowSettings = { showSettingsSheet = true },
+                    onShowFollowing = { showFollowingSheet = true },
                     onBackClick = onBackClick,
                     onUpdateVideoBounds = { videoViewBounds = it },
                     dragState = dragState,
@@ -539,7 +636,30 @@ fun PlayerScreen(
                     .weight(1f)
                     .graphicsLayer { alpha = 1f - (fraction * 2f).coerceIn(0f, 1f) }
             ) {
-                PlayerTabs(
+                StreamTabsBar(
+                    tabs = streamTabs,
+                    activeSlug = activeTabSlug,
+                    onSelectTab = { slug ->
+                        showFollowingPane = false
+                        onSelectTab(slug)
+                    },
+                    onCloseTab = onCloseTab,
+                    onNewTab = onNewTab,
+                    isFollowingSelected = showFollowingPane,
+                    onFollowingClick = { showFollowingPane = true }
+                )
+                if (showFollowingPane) {
+                    FollowingQuickList(
+                        openTabSlugs = streamTabs.map { it.slug },
+                        state = followingState,
+                        onOpenInNewTab = onOpenInNewTab,
+                        onOpenInBackground = onOpenInBackground,
+                        onProfileClick = onAvatarClick,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding()
+                    )
+                } else PlayerTabs(
                     selectedTabIndex = selectedTabIndex,
                     onTabSelected = { selectedTabIndex = it },
                     tabs = listOf(
@@ -575,6 +695,27 @@ fun PlayerScreen(
             )
         }
 
+        if (showFollowingSheet) {
+            ModalBottomSheet(onDismissRequest = { showFollowingSheet = false }) {
+                FollowingQuickList(
+                    openTabSlugs = streamTabs.map { it.slug },
+                    state = followingState,
+                    onOpenInNewTab = { slug ->
+                        showFollowingSheet = false
+                        onOpenInNewTab(slug)
+                    },
+                    onOpenInBackground = onOpenInBackground,
+                    onProfileClick = { slug ->
+                        showFollowingSheet = false
+                        onAvatarClick(slug)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(screenHeight * 0.6f)
+                )
+            }
+        }
+
         if (showChatSettingsSheet) {
             com.gallbladderz.openkick.features.player.components.ChatSettingsSheet(
                 settings = chatSettings,
@@ -584,3 +725,8 @@ fun PlayerScreen(
         }
     }
 }
+
+private const val FOLLOWING_REFRESH_MS = 2 * 60 * 1000L
+
+private fun FollowingUiState.Success.hasChannels() =
+    liveStreamers.isNotEmpty() || offlineStreamers.isNotEmpty()

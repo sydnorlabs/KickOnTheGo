@@ -5,6 +5,7 @@
 
 package com.gallbladderz.openkick.features.following
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,6 +55,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -86,7 +88,8 @@ fun FollowingRoute(
     onManageClick: () -> Unit = {},
     onStreamClick: (String) -> Unit,
     onProfileClick: (String) -> Unit,
-    onCategoryClick: (String) -> Unit = {}
+    onCategoryClick: (String) -> Unit = {},
+    onStreamOpenInBackground: ((String) -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
@@ -98,7 +101,8 @@ fun FollowingRoute(
         onManageClick = onManageClick,
         onStreamClick = onStreamClick,
         onProfileClick = onProfileClick,
-        onCategoryClick = onCategoryClick
+        onCategoryClick = onCategoryClick,
+        onStreamOpenInBackground = onStreamOpenInBackground
     )
 }
 
@@ -111,8 +115,21 @@ fun FollowingScreen(
     onManageClick: () -> Unit = {},
     onStreamClick: (String) -> Unit,
     onProfileClick: (String) -> Unit,
-    onCategoryClick: (String) -> Unit = {}
+    onCategoryClick: (String) -> Unit = {},
+    onStreamOpenInBackground: ((String) -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    // Long-press "open in background tab" only makes sense while a stream is playing.
+    val openInBackground: ((String) -> Unit)? = onStreamOpenInBackground?.let { open ->
+        { slug: String ->
+            open(slug)
+            Toast.makeText(
+                context,
+                context.getString(R.string.stream_background_tab_added, slug),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
     val bottomBarPadding =
         80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val liveCount = (state as? FollowingUiState.Success)?.liveStreamers?.size ?: 0
@@ -161,13 +178,20 @@ fun FollowingScreen(
                                             key = { it.slug },
                                             contentType = { "channel_avatar" }
                                         ) { streamer ->
-                                            StoryAvatarItem(streamer) {
-                                                if (streamer.isLive) {
-                                                    onStreamClick(streamer.slug)
-                                                } else {
-                                                    onProfileClick(streamer.slug)
-                                                }
-                                            }
+                                            StoryAvatarItem(
+                                                streamer = streamer,
+                                                onClick = {
+                                                    if (streamer.isLive) {
+                                                        onStreamClick(streamer.slug)
+                                                    } else {
+                                                        onProfileClick(streamer.slug)
+                                                    }
+                                                },
+                                                onProfileClick = { onProfileClick(streamer.slug) },
+                                                onOpenInBackground = openInBackground
+                                                    ?.takeIf { streamer.isLive }
+                                                    ?.let { open -> { open(streamer.slug) } }
+                                            )
                                         }
                                     }
                                 }
@@ -202,7 +226,9 @@ fun FollowingScreen(
                                     streamer = streamer,
                                     modifier = Modifier.padding(top = if (index == 0) 0.dp else 12.dp),
                                     onClick = { onStreamClick(streamer.slug) },
-                                    onProfileClick = { onProfileClick(streamer.slug) }
+                                    onProfileClick = { onProfileClick(streamer.slug) },
+                                    onOpenInBackground = openInBackground
+                                        ?.let { open -> { open(streamer.slug) } }
                                 )
                             }
                         }
@@ -293,14 +319,26 @@ private fun FollowingTopBar(liveCount: Int, onManageClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun StoryAvatarItem(streamer: FollowedStreamerUi, onClick: () -> Unit) {
+private fun StoryAvatarItem(
+    streamer: FollowedStreamerUi,
+    onClick: () -> Unit,
+    onProfileClick: () -> Unit = {},
+    onOpenInBackground: (() -> Unit)? = null
+) {
+    var showActions by remember { mutableStateOf(false) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(64.dp)
             .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = if (onOpenInBackground != null) {
+                    { showActions = true }
+                } else null
+            )
             .padding(vertical = 2.dp)
     ) {
         Box(contentAlignment = Alignment.TopCenter) {
@@ -338,6 +376,18 @@ private fun StoryAvatarItem(streamer: FollowedStreamerUi, onClick: () -> Unit) {
             textAlign = TextAlign.Center
         )
     }
+
+    if (showActions) {
+        StreamActionsSheet(
+            title = streamer.streamTitle,
+            streamerName = streamer.username,
+            channelSlug = streamer.slug,
+            thumbnailUrl = streamer.streamThumbnailUrl,
+            onDismiss = { showActions = false },
+            onProfileClick = onProfileClick,
+            onOpenInBackground = onOpenInBackground
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -346,7 +396,8 @@ private fun LiveStreamRow(
     streamer: FollowedStreamerUi,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onOpenInBackground: (() -> Unit)? = null
 ) {
     var showActions by remember { mutableStateOf(false) }
     Row(
@@ -436,7 +487,8 @@ private fun LiveStreamRow(
             channelSlug = streamer.slug,
             thumbnailUrl = streamer.streamThumbnailUrl,
             onDismiss = { showActions = false },
-            onProfileClick = onProfileClick
+            onProfileClick = onProfileClick,
+            onOpenInBackground = onOpenInBackground
         )
     }
 }

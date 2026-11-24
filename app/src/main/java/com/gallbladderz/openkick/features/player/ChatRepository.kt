@@ -381,6 +381,9 @@ class ChatRepository(
                 val connectionContext = currentCoroutineContext()
                 synchronized(lock) {
                     connectionContext.ensureActive()
+                    // With stream tabs the user can switch channels while this token request
+                    // is in flight; don't open a socket for a chatroom that is no longer shown.
+                    if (currentChatroomId != chatroomId || isManuallyDisconnected) return@launch
                     startWebSocketConnection(chatroomId, channelId)
                 }
             } catch (e: CancellationException) {

@@ -356,4 +356,12 @@
         <item quantity="one">Regaló %1$d suscripción</item>
         <item quantity="other">Regaló %1$d suscripciones</item>
     </plurals>
+    <string name="stream_tabs_new">Abrir otro directo</string>
+    <string name="stream_tabs_close">Cerrar %1$s</string>
+    <string name="stream_open_new_tab">Ver en una pestaña nueva</string>
+    <string name="stream_open_background_tab">Abrir en segundo plano</string>
+    <string name="stream_tab_already_open">Ya está abierto en una pestaña</string>
+    <string name="stream_background_tab_added">%1$s añadido a tus pestañas</string>
+    <string name="stream_show_following">Mostrar los canales que sigues</string>
+    <string name="offline">Desconectado</string>
 </resources>

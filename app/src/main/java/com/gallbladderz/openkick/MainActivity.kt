@@ -34,9 +34,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -55,6 +57,7 @@ import androidx.navigation.compose.rememberNavController
 import com.gallbladderz.openkick.core.auth.AppMode
 import com.gallbladderz.openkick.core.auth.OAuthManager
 import com.gallbladderz.openkick.core.auth.SessionManager
+import com.gallbladderz.openkick.core.datastore.StreamTabsRepository
 import com.gallbladderz.openkick.core.player.GlobalPlayerController
 import com.gallbladderz.openkick.core.player.LocalGlobalPlayerController
 import com.gallbladderz.openkick.core.player.PlayerMedia
@@ -85,6 +88,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.compose.koinInject
 
 val LocalBottomBarOffset = compositionLocalOf<() -> Float> { { 0f } }
 private const val PendingKickLinkKey = "pendingKickLink"
@@ -101,6 +105,7 @@ class MainActivity : AppCompatActivity() {
     private val offerMigration = mutableStateOf(false)
     private val isMigrating = mutableStateOf(false)
     private var pendingKickLink by mutableStateOf<KickWebLink?>(null)
+    private val openPlayerRequests = mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             pendingKickLink = savedInstanceState.getString(PendingKickLinkKey)?.let(::parseKickWebLink)
         }
+        handleOpenPlayerIntent(intent)
         lifecycleScope.launch {
             combine(
                 sessionManager.mode,
@@ -141,7 +147,8 @@ class MainActivity : AppCompatActivity() {
                     isMigrating.value, { isMigrating.value = it },
                     { authError.value = it },
                     kickDestination = pendingKickLink?.destination,
-                    onKickDestinationOpened = { pendingKickLink = null }
+                    onKickDestinationOpened = { pendingKickLink = null },
+                    openPlayerRequest = openPlayerRequests.intValue
                 )
             }
         }
@@ -153,6 +160,28 @@ class MainActivity : AppCompatActivity() {
         handleAuthIntent(intent)
         handlePipAudioIntent(intent)
         handleKickLinkIntent(intent)
+        handleOpenPlayerIntent(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Back on screen: video again if the screen lock switched to audio only, and back to
+        // live if the stream fell behind. Leaving the app (onStop) changes nothing, so
+        // multitasking never reloads the stream; only locking the screen goes audio only.
+        playerManager.onAppVisible()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Some phones only pause (not stop) the app while the screen is off, so unlocking
+        // brings no onStart. Doing the same here is harmless when onStart already did it.
+        playerManager.onAppVisible()
+    }
+
+    private fun handleOpenPlayerIntent(intent: Intent?) {
+        if (intent?.action != PlaybackService.ACTION_OPEN_PLAYER) return
+        intent.action = null
+        openPlayerRequests.intValue++
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -242,7 +271,8 @@ fun OpenKickAppContent(
     setMigrating: (Boolean) -> Unit,
     showError: (String?) -> Unit,
     kickDestination: KickLinkDestination? = null,
-    onKickDestinationOpened: () -> Unit = {}
+    onKickDestinationOpened: () -> Unit = {},
+    openPlayerRequest: Int = 0
 ) {
     val mode by session.mode.collectAsStateWithLifecycle()
     val scope = androidx.compose.runtime.rememberCoroutineScope()
@@ -258,6 +288,16 @@ fun OpenKickAppContent(
     } else {
         RequestPermissions()
         val globalPlayerController = remember { GlobalPlayerController() }
+        val streamTabsRepository: StreamTabsRepository = koinInject()
+        LaunchedEffect(globalPlayerController) {
+            globalPlayerController.restoreTabs(streamTabsRepository.tabsFlow.first())
+            snapshotFlow { globalPlayerController.tabsState }
+                .distinctUntilChanged()
+                .collectLatest { streamTabsRepository.save(it) }
+        }
+        LaunchedEffect(openPlayerRequest) {
+            if (openPlayerRequest > 0) globalPlayerController.showPlayerWithChat()
+        }
         val navController = rememberNavController()
         val bottomBarState = rememberBottomBarState(navController)
 
@@ -381,7 +421,8 @@ fun PlayerOverlay(
                 is PlayerMedia.Recording -> RecordedPlayerOverlay(
                     recording = media,
                     dragState = dragState,
-                    onClose = globalPlayerController::hidePlayer,
+                    // Closing a clip or VOD keeps the stream tabs for the next live stream.
+                    onClose = { globalPlayerController.hidePlayer(keepTabs = true) },
                     onProfileClick = openProfile
                 )
             }

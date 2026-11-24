@@ -17,6 +17,7 @@ import com.gallbladderz.openkick.core.auth.SessionManager
 import com.gallbladderz.openkick.core.data.local.AppDatabase
 import com.gallbladderz.openkick.core.datastore.SettingsRepository
 import com.gallbladderz.openkick.core.network.chat.SevenTvRepository
+import com.gallbladderz.openkick.core.datastore.StreamTabsRepository
 import com.gallbladderz.openkick.core.network.AuthInterceptor
 import com.gallbladderz.openkick.core.network.KickApiConstants
 import com.gallbladderz.openkick.core.network.MobileHeadersInterceptor
@@ -70,6 +71,7 @@ val appModule = module {
     single { SevenTvRepository() }
     single<SettingsRepository> { SettingsRepository(androidContext()) }
     single { VodPlaybackProgress(androidContext()) }
+    single<StreamTabsRepository> { StreamTabsRepository(androidContext()) }
     single<SessionManager> { SessionManager(androidContext()) }
     single<Retrofit>(named("bffRetrofit")) {
         val json = Json {

@@ -8,7 +8,9 @@
 package com.gallbladderz.openkick.core.player
 
 
+import android.app.PendingIntent
 import android.content.Intent
+import com.gallbladderz.openkick.MainActivity
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
@@ -60,8 +62,20 @@ class PlaybackService : MediaSessionService() {
             }
         }
 
+        // Without a session activity, tapping the media notification does nothing.
+        val openPlayerIntent = Intent(this, MainActivity::class.java)
+            .setAction(ACTION_OPEN_PLAYER)
+            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        val sessionActivity = PendingIntent.getActivity(
+            this,
+            REQUEST_OPEN_PLAYER,
+            openPlayerIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         mediaSession = MediaSession.Builder(this, player)
             .setCallback(customCallback)
+            .setSessionActivity(sessionActivity)
             .build()
     }
 
@@ -80,5 +94,7 @@ class PlaybackService : MediaSessionService() {
 
     companion object {
         const val ACTION_PIP_AUDIO_ONLY = "com.gallbladderz.openkick.action.PIP_AUDIO_ONLY"
+        const val ACTION_OPEN_PLAYER = "com.gallbladderz.openkick.action.OPEN_PLAYER"
+        private const val REQUEST_OPEN_PLAYER = 1001
     }
 }

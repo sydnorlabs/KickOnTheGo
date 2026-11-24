@@ -19,7 +19,7 @@ android {
         applicationId = "com.gallbladderz.openkick"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
+        versionCode = 10
         versionName = "1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BFF_BASE_URL", "\"${providers.gradleProperty("bffBaseUrl").getOrElse("https://kick.com/")}\"")
@@ -27,6 +27,11 @@ android {
         buildConfigField("String", "KICK_REDIRECT_URI", "\"openkick://oauth/callback\"")
     }
     buildTypes {
+        // Installs next to the official app as its own icon.
+        debug {
+            applicationIdSuffix = ".tabs"
+            versionNameSuffix = "-tabs"
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

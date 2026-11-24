@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,7 +52,8 @@ internal fun StreamActionsSheet(
     channelSlug: String,
     thumbnailUrl: String,
     onDismiss: () -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onOpenInBackground: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
@@ -103,6 +105,12 @@ internal fun StreamActionsSheet(
             }
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+            if (onOpenInBackground != null) {
+                StreamQuickAction(Icons.Default.Add, stringResource(R.string.stream_open_background_tab)) {
+                    onDismiss()
+                    onOpenInBackground()
+                }
+            }
             StreamQuickAction(Icons.Default.AccountCircle, stringResource(R.string.action_go_to_profile)) {
                 onDismiss()
                 onProfileClick()

@@ -354,4 +354,12 @@
     <plurals name="chat_badge_gifted_subs">
         <item quantity="other">Подаренных подписок: %1$d</item>
     </plurals>
+    <string name="stream_tabs_new">Открыть другой стрим</string>
+    <string name="stream_tabs_close">Закрыть %1$s</string>
+    <string name="stream_open_new_tab">Смотреть в новой вкладке</string>
+    <string name="stream_open_background_tab">Открыть в фоновой вкладке</string>
+    <string name="stream_tab_already_open">Уже открыт во вкладке</string>
+    <string name="stream_background_tab_added">%1$s добавлен во вкладки</string>
+    <string name="stream_show_following">Показать каналы, на которые вы подписаны</string>
+    <string name="offline">Не в сети</string>
 </resources>
