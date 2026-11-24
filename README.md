@@ -1,64 +1,69 @@
 <div align="center">
 <br />
-<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" alt="OpenKick logo" width="192" />
+<img src="docs/kotg-icon-512.png" alt="KickOnTheGo icon" width="160" />
 </div>
 
-<h1 align="center">OpenKick</h1>
+<h1 align="center">KickOnTheGo (KOTG)</h1>
 
 <p align="center">
-  An open-source Android client for <a href="https://kick.com">Kick.com</a> with account sign-in, live chat, streams, clips, and VODs.<br />
-  Available in English, Spanish, Russian, and Simplified Chinese (简体中文).
+  Kick streams in tabs, made for listening on the go.<br />
+  An unofficial Android app for Kick, built on <a href="https://github.com/Gallbladderz/OpenKick">OpenKick</a>.
 </p>
 
-<div align="center">
-  <a href="https://github.com/Gallbladderz/OpenKick/releases"><img src="https://user-images.githubusercontent.com/69304392/148696068-0cfea65d-b18f-4685-82b5-329a330b1c0d.png" alt="Get it on GitHub" height="80" /></a>
-  &nbsp;&nbsp;
-  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.gallbladderz.openkick%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FGallbladderz%2FOpenKick%22%2C%22author%22%3A%22Gallbladderz%22%2C%22name%22%3A%22OpenKick%22%2C%22additionalSettings%22%3A%22%7B%5C%22appName%5C%22%3A%5C%22OpenKick%5C%22%2C%5C%22appAuthor%5C%22%3A%5C%22Gallbladderz%5C%22%2C%5C%22about%5C%22%3A%5C%22An%20open-source%20Android%20client%20for%20Kick.com.%5C%22%7D%22%7D"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="80" /></a>
-</div>
+<p align="center">
+  <a href="https://github.com/sydnorlabs/KickOnTheGo/releases/latest">Download the latest APK</a>
+  &nbsp;·&nbsp;
+  <a href="https://ko-fi.com/sydnorlabs">Support on Ko-fi</a>
+</p>
 
-## Features
+<p align="center">
+  <img src="docs/kotg-shot-1-tabs.png" width="30%" alt="Streams in tabs" />
+  <img src="docs/kotg-shot-2-following.png" width="30%" alt="Following under the stream" />
+  <img src="docs/kotg-shot-3-player.png" width="30%" alt="Made for the road" />
+</p>
 
-- **Kick account and guest mode.** Sign in to sync followed channels and categories and write in chat. Guest mode keeps follows on your device and lets you read chat.
-- **Live streams, VODs, and clips.** Rewind live streams when a DVR window or archive is available, jump back to live, and resume VODs where you stopped. The player includes quality selection and fullscreen gestures for brightness and volume.
-- **Mini-player, background playback, and picture-in-picture.** Minimize streams, clips, and VODs inside the app or keep watching or listening while using other apps.
-- **Downloads and offline playback.** Download clips and VODs in the background, choose a quality and time range for supported VODs, and play saved media offline. Manage downloads from Settings.
-- **Live chat and chat replay.** Swipe to reply, view pinned messages and badges, and see unread counts when scrolling is paused. Watch synchronized chat replay on supported clips and VODs.
-- **Kick and 7TV emotes.** Search the emote picker, browse channel and global 7TV sets, and view animated, wide, and overlapping emotes. Toggle 7TV in chat settings.
-- **Following and notifications.** See which followed channels are live, search your follows, and receive alerts when followed channels go live.
-- **Search, discovery, and Kick links.** Search channels, streams, and categories, browse category feeds and streamer profiles, and open Kick links to channels, categories, clips, and VODs in the app.
-- **Personalization.** Use dynamic colors or Catppuccin themes and adjust chat text size, name colors, badges, and emote animation with a live preview.
+## What it adds
+
+- **Stream tabs:** keep up to 5 channels open and switch in one tap. Only the tab you're on plays, so it stays light on battery and data.
+- **Following under the stream:** see who's live without leaving the player, and open them in a new or background tab. The list loads when the player opens and refreshes every 2 minutes.
+- **Made for the road:** auto-reconnects when your phone switches between LTE and 5G, or Wi-Fi and cellular, and keeps retrying through dead zones.
+- **Audio only on lock:** video pauses when your screen locks and comes back when you return. Tapping the notification opens the player with chat.
+- **Back to live:** jumps back to live after a stall, unless you rewind on purpose.
+
+Everything else comes from OpenKick 1.4: Kick sign-in, live rewind, clips and VODs, downloads, 7TV emotes, chat replay and more.
+
+## Why I made it
+
+I listen to Kick streams while I drive. Listening in my browser drained my battery, so I switched to OpenKick. Two things kept getting in the way. I like to easily switch through and listen to multiple streams while on the go, and I wanted that without the battery hit. And every time my phone hopped between LTE and 5G the stream froze and I had to reload it, which isn't something you can do while driving.
+
+So I built KickOnTheGo with Claude Duet: tabs for up to 5 streams where only one plays, a Following list right under the stream, and a player that reconnects on its own when the network changes.
+
+## Install
+
+Download `KickOnTheGo-1.0.0.apk` from [Releases](https://github.com/sydnorlabs/KickOnTheGo/releases) and open it on your phone (Android 8.0 or later). To get updates automatically, add this repo's URL in [Obtainium](https://github.com/ImranR98/Obtainium).
+
+KickOnTheGo installs as its own app (`dev.sydnorlabs.kickonthego`), so it can sit next to OpenKick.
+
+## Support
+
+KickOnTheGo is free and open source. If it makes your drive or your day better, a donation helps me keep it updated with each new OpenKick release and keep my build server running: [ko-fi.com/sydnorlabs](https://ko-fi.com/sydnorlabs)
 
 ## Build
 
-Use JDK 17 for Gradle and install Android SDK Platform 36 in Android Studio's SDK Manager. To run the app, use a device or emulator with Android 8.0 (API 26) or later.
-
-```bash
-git clone https://github.com/Gallbladderz/OpenKick.git
-cd OpenKick
-```
-
-Open the project in Android Studio, sync Gradle, and run the `app` configuration. To build a debug APK from the terminal, use the Gradle wrapper from the project root.
+Use JDK 17 or later and Android SDK Platform 36.
 
 ```bash
 ./gradlew :app:assembleDebug
 ```
 
-On Windows (PowerShell), run `.\gradlew.bat :app:assembleDebug`. The APK is generated at `app/build/outputs/apk/debug/app-debug.apk`.
+Release builds are signed with a key kept outside the repo. Point Gradle at a properties file with `storeFile`, `storePassword`, `keyAlias` and `keyPassword`:
 
-### Authentication configuration
+```bash
+./gradlew :app:assembleRelease -PkotgKeystoreProps=/path/to/keystore.properties
+```
 
-Guest mode and Kick account sign-in work with the default build configuration. Choose **Sign in to Kick** on the welcome screen or in Settings, confirm the prompt, and sign in on the Kick website inside the app. OpenKick picks up your session and returns you to the app.
+## Credits and license
 
-The channel-follow and OAuth API clients use `https://kick.com/` by default. For development against a compatible backend, set the optional `bffBaseUrl` in your user-level Gradle properties.
+KickOnTheGo is a fork of [OpenKick](https://github.com/Gallbladderz/OpenKick) by Gallbladderz. All of OpenKick's work stays under its original copyright, and KickOnTheGo is released under the same [GNU GPL-3.0](LICENSE).
 
-## Privacy
-
-Guest follows and app settings are stored locally on the device. When you sign in, OpenKick stores the session required to access your Kick account and synchronizes account follows with Kick.
-
-When 7TV emotes are enabled, OpenKick fetches global and channel emote sets from `7tv.io`.
-
-## License
-
-OpenKick is distributed under the **GPL-3.0 License**. See [LICENSE](LICENSE) for the full license text.
-
-OpenKick is not affiliated with Kick.com.
+KickOnTheGo is not made by, endorsed by or affiliated with Kick. Kick is a trademark of its owner.
