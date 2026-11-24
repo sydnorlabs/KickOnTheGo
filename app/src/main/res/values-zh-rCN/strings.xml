@@ -33,7 +33,7 @@
     <string name="all_followed_arrow">全部关注 ➔</string>
     <string name="all_languages">所有语言</string>
     <string name="anonymous">匿名</string>
-    <string name="app_name">OpenKick</string>
+    <string name="app_name">KickOnTheGo</string>
     <string name="appearance">外观</string>
     <string name="application_language">应用语言</string>
     <string name="application_title">应用</string>
@@ -287,10 +287,10 @@
     <string name="kick_login_instruction_title">如何登录账号</string>
     <string name="kick_login_instruction_open">即将打开 kick.com 网站。</string>
     <string name="kick_login_instruction_profile">点击页面&lt;b&gt;右上角的个人资料图标&lt;/b&gt;，然后登录你的账号。</string>
-    <string name="kick_login_instruction_return">登录后，OpenKick 会&lt;b&gt;自动获取会话 Cookie&lt;/b&gt;并返回应用。</string>
+    <string name="kick_login_instruction_return">登录后，KickOnTheGo 会&lt;b&gt;自动获取会话 Cookie&lt;/b&gt;并返回应用。</string>
     <string name="kick_login_instruction_continue">继续登录</string>
     <string name="welcome_subtitle">选择你想如何观看 Kick。</string>
-    <string name="welcome_title">欢迎使用 OpenKick</string>
+    <string name="welcome_title">欢迎使用 KickOnTheGo</string>
     <string name="clear_search">清除搜索</string>
     <string name="following_live_badge">直播</string>
     <string name="following_no_live_channels">你关注的频道目前都未开播</string>

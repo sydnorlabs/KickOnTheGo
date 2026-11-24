@@ -43,7 +43,7 @@ class KickWebLinkTest {
     fun ignoresOtherSitesAndLeavesUnsupportedKickPagesForTheBrowser() {
         assertNull(parseKickWebLink("https://kick.com.example.org/ozon689games3"))
         assertNull(parseKickWebLink("https://example.org@kick.com/ozon689games3"))
-        assertNull(parseKickWebLink("openkick://oauth/callback?code=sample"))
+        assertNull(parseKickWebLink("kickonthego://oauth/callback?code=sample"))
 
         val unsupported = parseKickWebLink("https://kick.com/privacy-policy")
         assertNotNull(unsupported)

@@ -27,7 +27,7 @@
     <string name="all_followed_arrow">All Followed ➔</string>
     <string name="all_languages">All languages</string>
     <string name="anonymous">Anonymous</string>
-    <string name="app_name">OpenKick</string>
+    <string name="app_name">KickOnTheGo</string>
     <string name="appearance">Appearance</string>
     <string name="application_language">Application language</string>
     <string name="application_title">Application</string>
@@ -281,10 +281,10 @@
     <string name="kick_login_instruction_title">How to sign in</string>
     <string name="kick_login_instruction_open">The kick.com website will open.</string>
     <string name="kick_login_instruction_profile">Tap the &lt;b&gt;profile icon in the top-right corner&lt;/b&gt; of the page and sign in to your account.</string>
-    <string name="kick_login_instruction_return">OpenKick will &lt;b&gt;pick up your session cookies automatically&lt;/b&gt; and return you to the app.</string>
+    <string name="kick_login_instruction_return">KickOnTheGo will &lt;b&gt;pick up your session cookies automatically&lt;/b&gt; and return you to the app.</string>
     <string name="kick_login_instruction_continue">Continue to sign in</string>
     <string name="welcome_subtitle">Choose how you want to watch Kick.</string>
-    <string name="welcome_title">Welcome to OpenKick</string>
+    <string name="welcome_title">Welcome to KickOnTheGo</string>
     <string name="clear_search">Clear search</string>
     <string name="following_live_badge">LIVE</string>
     <string name="following_no_live_channels">None of your followed channels are live right now</string>

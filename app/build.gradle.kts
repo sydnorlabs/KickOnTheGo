@@ -15,24 +15,39 @@ android {
     namespace = "com.gallbladderz.openkick"
     compileSdk = 36
 
+    // Release signing: keystore.properties sits outside the repo (storeFile, storePassword, keyAlias, keyPassword).
+    val keystorePropsFile = providers.gradleProperty("kotgKeystoreProps").map { file(it) }.orNull
+    if (keystorePropsFile != null && keystorePropsFile.exists()) {
+        val props = java.util.Properties().apply { keystorePropsFile.inputStream().use { load(it) } }
+        signingConfigs {
+            create("kotgRelease") {
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
+    }
+
     defaultConfig {
-        applicationId = "com.gallbladderz.openkick"
+        applicationId = "dev.sydnorlabs.kickonthego"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "1.4"
+        versionCode = 1
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BFF_BASE_URL", "\"${providers.gradleProperty("bffBaseUrl").getOrElse("https://kick.com/")}\"")
         buildConfigField("String", "KICK_CLIENT_ID", "\"${providers.gradleProperty("kickClientId").getOrElse("")}\"")
-        buildConfigField("String", "KICK_REDIRECT_URI", "\"openkick://oauth/callback\"")
+        buildConfigField("String", "KICK_REDIRECT_URI", "\"kickonthego://oauth/callback\"")
     }
     buildTypes {
-        // Installs next to the official app as its own icon.
+        // Test builds install next to the release as their own icon.
         debug {
-            applicationIdSuffix = ".tabs"
-            versionNameSuffix = "-tabs"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
         }
         release {
+            signingConfig = signingConfigs.findByName("kotgRelease")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

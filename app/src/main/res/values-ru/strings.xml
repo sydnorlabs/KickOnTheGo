@@ -27,7 +27,7 @@
     <string name="all_followed_arrow">Все отслеживаемые ➔</string>
     <string name="all_languages">Все языки</string>
     <string name="anonymous">Аноним</string>
-    <string name="app_name">OpenKick</string>
+    <string name="app_name">KickOnTheGo</string>
     <string name="appearance">Внешний вид</string>
     <string name="application_language">Язык приложения</string>
     <string name="application_title">Приложение</string>
@@ -280,10 +280,10 @@
     <string name="kick_login_instruction_title">Как войти в аккаунт</string>
     <string name="kick_login_instruction_open">Сейчас откроется сайт kick.com.</string>
     <string name="kick_login_instruction_profile">Нажми на &lt;b&gt;иконку профиля в правом верхнем углу&lt;/b&gt; страницы и войди в аккаунт.</string>
-    <string name="kick_login_instruction_return">После входа &lt;b&gt;куки подтянутся автоматически&lt;/b&gt;, и OpenKick вернёт тебя обратно в приложение.</string>
+    <string name="kick_login_instruction_return">После входа &lt;b&gt;куки подтянутся автоматически&lt;/b&gt;, и KickOnTheGo вернёт тебя обратно в приложение.</string>
     <string name="kick_login_instruction_continue">Продолжить к входу</string>
     <string name="welcome_subtitle">Выбери, как пользоваться приложением.</string>
-    <string name="welcome_title">Добро пожаловать в OpenKick</string>
+    <string name="welcome_title">Добро пожаловать в KickOnTheGo</string>
     <string name="clear_search">Очистить поиск</string>
     <string name="following_live_badge">ЭФИР</string>
     <string name="following_no_live_channels">Сейчас никто из ваших подписок не в эфире</string>
